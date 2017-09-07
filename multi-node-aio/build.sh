@@ -38,5 +38,6 @@ ansible-playbook -vv \
                  -e http_proxy=${http_proxy:-''} \
                  -e run_osa=${RUN_OSA:-"true"} \
                  -e pre_config_osa=${PRE_CONFIG_OSA:-"true"} \
+                 -e config_prerouting=${CONFIG_PREROUTING:-"false"} \
                  --force-handlers \
                  playbooks/site.yml

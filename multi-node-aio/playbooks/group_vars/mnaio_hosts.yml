@@ -48,3 +48,9 @@ mnaio_host_iptables_rules:
     chain: POSTROUTING
     out_interface: "{{ masquerade_interface | default(default_interface) }}"
     jump: MASQUERADE
+
+mnaio_host_iptables_prerouting_osa_ports:
+  - 6080
+  - 6082
+  - 443
+  - 80
