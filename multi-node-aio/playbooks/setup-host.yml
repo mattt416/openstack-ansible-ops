@@ -111,22 +111,12 @@
         - table: 'mangle'
           rule: 'POSTROUTING -s 10.0.2.0/22 -o vm-br-dhcp -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill'
 
-    - name: Add IPtables pre-routing rule to allow external SSH access to infra1
+    - name: Add IPtables pre-routing rules to allow external access to VMs
       shell: |
-        if ! iptables -w -t {{ item.table }} -C {{ item.rule }};then
-          iptables -w -t {{ item.table }} -I {{ item.rule }}
+        if ! iptables -w -t nat -C PREROUTING -p tcp -d {{ ansible_default_ipv4.address }} --dport {{ item.host_port }} -j DNAT --to {{ item.vm_ip }}:{{ item.vm_port }};then
+          iptables -w -t nat -I PREROUTING -p tcp -d {{ ansible_default_ipv4.address }} --dport {{ item.host_port }} -j DNAT --to {{ item.vm_ip }}:{{ item.vm_port }}
         fi
-      with_items:
-        - table: 'nat'
-          rule: "PREROUTING -p tcp -d {{ ansible_default_ipv4.address }} --dport 2222 -j DNAT --to {{ hostvars[groups['deploy_hosts'][0]]['server_vm_fixed_addr'] }}:22"
-      when: config_prerouting | default(false) | bool
-
-    - name: Add IPtables pre-routing rules to allow external access to OSA ports
-      shell: |
-        if ! iptables -w -t nat -C PREROUTING -p tcp -d {{ ansible_default_ipv4.address }} --dport {{ item }} -j DNAT --to {{ hostvars[groups['loadbalancer_hosts'][0]]['server_vm_fixed_addr'] }}:{{ item }};then
-          iptables -w -t nat -I PREROUTING -p tcp -d {{ ansible_default_ipv4.address }} --dport {{ item }} -j DNAT --to {{ hostvars[groups['loadbalancer_hosts'][0]]['server_vm_fixed_addr'] }}:{{ item }}
-        fi
-      with_items: "{{ mnaio_host_iptables_prerouting_osa_ports }}"
+      with_items: "{{ mnaio_host_iptables_prerouting_ports }}"
       when: config_prerouting | default(false) | bool
 
     - name: Start netfilter persistent
