@@ -6,6 +6,9 @@
 # Note: options passed to the installer will be added automatically.
 d-i debian-installer/add-kernel-opts string biosdevname=0 net.ifnames=0 elevator=noop
 
+### Base system installation
+d-i base-installer/kernel/image string linux-image-4.4.0-66-generic
+
 # Networking
 d-i netcfg/choose_interface select eth0
 d-i netcfg/dhcp_timeout string 60
